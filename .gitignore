@@ -2,3 +2,5 @@ build/*.rbxl
 build/*.rbxlx
 tools/bin/
 sourcemap.json
+__pycache__/
+*.pyc
