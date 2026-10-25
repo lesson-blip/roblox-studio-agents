@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Seed Siege 3D preview</title>
+<style>
+  @font-face { font-family: 'Fredoka'; font-weight: 500; src: url(fonts/fredoka-500.ttf) format('truetype'); }
+  @font-face { font-family: 'Fredoka'; font-weight: 600; src: url(fonts/fredoka-600.ttf) format('truetype'); }
+  @font-face { font-family: 'Fredoka'; font-weight: 700; src: url(fonts/fredoka-700.ttf) format('truetype'); }
+  html, body { margin: 0; width: 1600px; height: 900px; overflow: hidden; background: #9fd3f2; }
+  canvas#c { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; display: block; }
+  #hud { position: absolute; inset: 0; pointer-events: none; font-family: 'Fredoka', 'Arial Rounded MT Bold', system-ui, sans-serif; color: #fff; }
+  .hidden { display: none !important; }
+  .stroke { paint-order: stroke fill; -webkit-text-stroke: 5px #23202b; }
+  .pill { position: absolute; display: flex; align-items: center; gap: 10px; height: 58px; padding: 0 22px 0 10px;
+          border-radius: 18px; background: linear-gradient(#3a3646, #24212d); border: 3px solid #14121a;
+          box-shadow: 0 5px 0 #14121a, 0 10px 18px rgba(0,0,0,0.25), inset 0 2px 0 rgba(255,255,255,0.12); }
+  .pill .num { font-size: 36px; font-weight: 700; letter-spacing: 0.5px; }
+  .pill svg { width: 44px; height: 44px; filter: drop-shadow(0 3px 0 rgba(0,0,0,0.35)); }
+  #hearts { left: 96px; top: 22px; }
+  #sap { left: 250px; top: 22px; }
+  #robloxspace { position: absolute; left: 22px; top: 22px; width: 58px; height: 58px; border-radius: 14px;
+                 background: rgba(20,18,26,0.55); }
+  #robloxspace::after { content: ''; position: absolute; left: 17px; top: 17px; width: 24px; height: 24px; border-radius: 5px;
+                 border: 4px solid rgba(255,255,255,0.85); transform: rotate(15deg); box-sizing: border-box; }
+  #wave { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); text-align: center; }
+  #wave .title { font-size: 44px; font-weight: 700; line-height: 1; }
+  #wave .bar { margin: 10px auto 0; width: 330px; height: 22px; border-radius: 12px; background: #24212d; border: 3px solid #14121a;
+               box-shadow: 0 4px 0 #14121a; overflow: hidden; position: relative; }
+  #wave .bar i { position: absolute; left: 3px; top: 3px; bottom: 3px; width: 58%; border-radius: 8px;
+                 background: linear-gradient(#ffd75e, #f2a528); box-shadow: inset 0 3px 0 rgba(255,255,255,0.45); }
+  #wave .sub { margin-top: 6px; font-size: 21px; font-weight: 600; }
+  #topright { position: absolute; right: 24px; top: 22px; display: flex; gap: 14px; }
+  .btn { height: 58px; min-width: 58px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+         font-size: 28px; font-weight: 700; border: 3px solid #14121a; box-shadow: 0 5px 0 #14121a, inset 0 3px 0 rgba(255,255,255,0.35); }
+  .btn.speed { padding: 0 18px; background: linear-gradient(#6fd0ff, #2f9be0); }
+  .btn.menu { background: linear-gradient(#5a5568, #3a3646); }
+  .btn.menu span { display: block; width: 26px; height: 4px; border-radius: 2px; background: #fff; box-shadow: 0 -9px 0 #fff, 0 9px 0 #fff; }
+  #seedbar { position: absolute; left: 24px; bottom: 22px; display: flex; gap: 14px; align-items: flex-end; }
+  .card { position: relative; width: 122px; height: 152px; border-radius: 20px; border: 3px solid #14121a;
+          box-shadow: 0 6px 0 #14121a, 0 12px 20px rgba(0,0,0,0.25); overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+  .card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, rgba(255,255,255,0.55), rgba(255,255,255,0) 60%); }
+  .card .key { position: absolute; left: 8px; top: 6px; font-size: 20px; font-weight: 700; z-index: 2; }
+  .card img { position: relative; width: 112px; height: 96px; object-fit: contain; margin-top: 4px; z-index: 1; }
+  .card .name { position: relative; z-index: 1; font-size: 17px; font-weight: 700; line-height: 1; margin-top: -2px; white-space: nowrap; }
+  .card .cost { position: relative; z-index: 1; margin-top: 6px; display: flex; align-items: center; gap: 4px; font-size: 22px; font-weight: 700; }
+  .card .cost svg { width: 20px; height: 20px; }
+  .card.sel { transform: translateY(-14px); border-color: #fff8d6; box-shadow: 0 0 0 4px #14121a, 0 6px 0 4px #14121a, 0 0 26px 6px rgba(255,236,140,0.85); }
+  #tip { position: absolute; right: 24px; bottom: 26px; display: flex; align-items: center; gap: 12px; }
+  #tip .face { width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #fff6e8, #f5c98c);
+               border: 3px solid #14121a; box-shadow: 0 5px 0 #14121a; overflow: hidden; }
+  #tip .face img { width: 100%; height: 100%; object-fit: cover; }
+  #tip .bubble { position: relative; background: #fffaf0; color: #2c2633; border: 3px solid #14121a; border-radius: 18px;
+                 box-shadow: 0 5px 0 #14121a; padding: 12px 18px; font-size: 22px; font-weight: 600; max-width: 300px; line-height: 1.2; }
+  #tip .bubble b { color: #c2410c; }
+  #tip .bubble .who { font-size: 16px; font-weight: 700; color: #6b5d7a; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .float { position: absolute; transform: translate(-50%, -50%); font-size: 34px; font-weight: 700; color: #b8f55a; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div id="robloxspace"></div>
+  <div class="pill" id="hearts">
+    <svg viewBox="0 0 48 48"><path d="M24 42 C6 30 3 20 7 13 C11 6 20 6 24 13 C28 6 37 6 41 13 C45 20 42 30 24 42 Z" fill="#ff4d5e" stroke="#14121a" stroke-width="3"/><ellipse cx="15" cy="16" rx="4" ry="3" fill="#fff" opacity="0.7"/></svg>
+    <span class="num stroke">17</span>
+  </div>
+  <div class="pill" id="sap">
+    <svg viewBox="0 0 48 48"><path d="M24 4 C24 4 9 22 9 31 C9 39 16 45 24 45 C32 45 39 39 39 31 C39 22 24 4 24 4 Z" fill="#ffc23a" stroke="#14121a" stroke-width="3"/><path d="M17 30 C17 36 21 39 25 39" stroke="#fff" stroke-width="3" fill="none" opacity="0.75" stroke-linecap="round"/></svg>
+    <span class="num stroke">240</span>
+  </div>
+  <div id="wave">
+    <div class="title stroke">Wave 4 / 10</div>
+    <div class="bar"><i></i></div>
+    <div class="sub stroke">8 pests left</div>
+  </div>
+  <div id="topright">
+    <div class="btn speed stroke">1.5x</div>
+    <div class="btn menu"><span></span></div>
+  </div>
+  <div id="seedbar"></div>
+  <div id="tip">
+    <div class="bubble"><span class="who">Nan</span>Snails are tough. Try a <b>Snapjaw</b>!</div>
+    <div class="face"><img id="nanface" alt=""></div>
+  </div>
+  <div id="floats"></div>
+</div>
+<script type="module" src="./scene.js"></script>
+</body>
+</html>

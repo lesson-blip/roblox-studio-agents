@@ -1,0 +1,14 @@
+[
+ {"file": "field-backyard.png", "title": "Backyard Patch map", "kind": "image",
+  "caption": "Top-down map of the Backyard Patch 12 by 8 grid with its 10 waves, 65 plantable tiles and the pest path from start to garden gate, drawn from the prototype simulation's field data."},
+ {"file": "field-veggie.png", "title": "Veggie Rows map", "kind": "image",
+  "caption": "Top-down map of the Veggie Rows 12 by 8 grid with its 15 waves, 71 plantable tiles and the pest path from start to garden gate, drawn from the prototype simulation's field data."},
+ {"file": "field-orchard.png", "title": "Night Orchard map", "kind": "image",
+  "caption": "Top-down map of the Night Orchard 12 by 8 grid with its 20 waves, 65 plantable tiles and the pest path from start to garden gate, drawn from the prototype simulation's field data."},
+ {"file": "balance-hearts.png", "title": "Hearts left after each wave", "kind": "image",
+  "caption": "Hearts left after each wave on the three fields for the prototype simulation's scripted bot with no research and with mid research (960 Petals), a simulated bot and not a real player."},
+ {"file": "weekly-spread.png", "title": "Weekly field spread, 2027", "kind": "image",
+  "caption": "How many of the 40 weekly field waves the prototype simulation's greedy bot cleared in each of the 52 ISO weeks of 2027, with a median of 29 waves."},
+ {"file": "seeds-chart.png", "title": "The 10 seeds compared", "kind": "image",
+  "caption": "Each of the 10 seeds plotted by Sap cost against level 1 damage per second, using the seed table shared by the spec and the prototype simulation."}
+]

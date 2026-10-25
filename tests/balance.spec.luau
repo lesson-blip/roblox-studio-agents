@@ -1,0 +1,53 @@
+--!strict
+-- Balance bands from spec 8.1 using the Appendix B scripts (the weekly bot band is M3).
+local A = require("./assert")
+local S = require("./fixtures/scripts")
+local R = require("./helpers/runscript")
+
+local FROST = 1.4
+
+return function(test)
+	test("Backyard R0 reproduces the prototype: win with 17 hearts", function()
+		local r = R.run(S.backyard, { bonuses = S.R0 })
+		A.truthy(r.won, "won")
+		A.eq(r.hearts, 17)
+	end)
+	test("Backyard R0 wins with at least 12 hearts (band)", function()
+		local r = R.run(S.backyard, { bonuses = S.R0 })
+		A.truthy(r.won and r.hearts >= 12)
+	end)
+	test("Backyard RMID 17 hearts and RFULL 25 hearts (prototype table)", function()
+		A.eq(R.run(S.backyard, { bonuses = S.RMID }).hearts, 17)
+		A.eq(R.run(S.backyard, { bonuses = S.RFULL }).hearts, 25)
+	end)
+	test("Backyard Frost R0, RMID, RFULL win with 6, 10, 19 hearts (prototype table)", function()
+		local expect = { { S.R0, 6 }, { S.RMID, 10 }, { S.RFULL, 19 } }
+		for _, e in expect do
+			local r = R.run(S.backyard, { bonuses = e[1], hpExtra = FROST })
+			A.truthy(r.won); A.eq(r.hearts, e[2])
+		end
+	end)
+	test("Backyard with 3 Thorn Sprouts only loses between waves 7 and 10", function()
+		local r = R.run(S.backyardLazy, { bonuses = S.R0 })
+		A.falsy(r.won)
+		A.truthy(r.waveReached >= 7 and r.waveReached <= 10, "lost on wave " .. r.waveReached)
+		A.eq(r.waveReached, 9, "prototype: lose wave 9")
+	end)
+	test("Veggie Rows R0 wins with 6 to 18 hearts, RMID with at least 15", function()
+		local r0 = R.run(S.veggie, { bonuses = S.R0 })
+		A.truthy(r0.won and r0.hearts >= 6 and r0.hearts <= 18, "R0 hearts " .. r0.hearts)
+		local rm = R.run(S.veggie, { bonuses = S.RMID })
+		A.truthy(rm.won and rm.hearts >= 15, "RMID hearts " .. rm.hearts)
+	end)
+	test("Night Orchard: R0 loses before wave 12, RMID wins, RFULL wins with at least 20", function()
+		local r0 = R.run(S.orchard, { bonuses = S.R0 })
+		A.truthy(not r0.won and r0.waveReached < 12, "R0 wave " .. r0.waveReached)
+		A.truthy(R.run(S.orchard, { bonuses = S.RMID }).won, "RMID")
+		local rf = R.run(S.orchard, { bonuses = S.RFULL })
+		A.truthy(rf.won and rf.hearts >= 20, "RFULL hearts " .. rf.hearts)
+	end)
+	test("Frost Night Orchard: RMID loses, RFULL wins", function()
+		A.falsy(R.run(S.orchard, { bonuses = S.RMID, hpExtra = FROST }).won)
+		A.truthy(R.run(S.orchard, { bonuses = S.RFULL, hpExtra = FROST }).won)
+	end)
+end
