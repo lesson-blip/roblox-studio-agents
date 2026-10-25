@@ -1,40 +1,41 @@
 # Seed Siege: one page summary
 
-**What it is.** A garden tower defence on Roblox. Bugs march along a path to your shed. You plant seeds beside the path; they grow into plants that shoo the bugs away. Beating bugs gives Sap to plant more. Every game, win or lose, gives Petals, which you spend on lasting upgrades and new seeds. You can play alone or with one friend on the same garden.
+**What it is.** A co-op garden tower defence in an Aussie backyard. Meet your mates at Nan's Backyard, step onto a garden gate together (1 to 4 players, no typing), and plant cheeky plants with faces beside the path to shoo off bugs, swooping magpies, cockatoos, possums and Kevin the Bin Chicken before they reach Nan's shed. Every wave drops a Seed Pod for a named plant, so you grow a collection of 24 plants from Common to Champion just by playing. Nothing random is ever sold.
 
-**Who it is for first.** Players 16 and over, because Roblox now shows new games only to age-checked 16+ players at first. It is kept gentle (cartoon bugs puff into leaves and run off, no blood, no scary bits, no typing, no gambling) so it can later be opened to younger players too.
+**Who it is for first.** Players 16 and over, because Roblox shows new games only to age-checked 16+ players at first. It stays gentle so it can open to younger players later: bugs puff into leaves, animals are only ever shooed (they get grumpy and leave, never hurt), no blood, no scary bits, no typing, no gambling.
 
 **What is in the first version.**
 
-- 10 seeds (cheap Thorn Sprout up to the big Oak Sentinel) and 10 pests (aphids up to a Night Possum boss). Some pests fly, hide underground, wear armour or split in two, so you have to pick the right plants.
-- 3 gardens: Backyard Patch (10 waves, also the tutorial), Veggie Rows (15 waves, flying bugs), Night Orchard (20 waves, moles and the possum). Plus a harder Frost mode for each.
-- A new **weekly garden every Monday**, made automatically from the date, with two twists (for example Fog or Drought) and a leaderboard. Everyone plays it with the same plants, so nobody can buy a better score.
-- A research tree of 20 upgrades. A free player who plays about half an hour a day finishes it in about three weeks; after that, stars, Frost and the weekly board keep it going.
+- **The cast.** Nan hosts the hub and cheers you on in runs ("Righto, gardeners. Here they come!"). 24 plants with faces and moods, from grumpy Thorn Sprout to the Grand Old Gum with a kookaburra on top. 20 pests: the original bugs plus blowies, stink bugs, cane toads, magpies, cockatoos, brush turkeys, flying foxes and a wombat, and three bosses: **Kevin the Bin Chicken** (nicks your plants and hides in a wheelie bin), **Swoopy the Magpie** and **Possum Pete**.
+- **Co-op for 1 to 4.** A hub with four garden gates, Nan, the Seed Almanac, a display bed for everyone's favourite plants and a weekly board. Each player defends their own stretch of path with their own Sap; hearts are shared. Pests get tougher with more players, so it is about as hard together as alone. Invite friends with Roblox's own invite button.
+- **The collection.** Six tiers named for an agricultural show: Common, Uncommon, Rare, Ribbon, Blue Ribbon, Champion. The chances are shown on screen, plants you don't have yet are twice as likely, and guarantees mean nobody gets stuck (a Champion within 300 pods, and you pick which). Spare pods level plants up to 10. A typical player (about 30 minutes a day) gets their first Champion around day 11 and all 24 plants around day 21.
+- 3 gardens (Backyard Patch with Kevin as the finale, Veggie Rows with Swoopy, Night Orchard with Possum Pete and the Wombat), Frost mode, the research tree, and the automatic **weekly garden every Monday** where everyone plays with the same plants.
 
-**The first five minutes.** No reading. You land straight in your garden. Short tips (8 words or fewer) point at one thing at a time: tap a seed, plant it, start the wave. By minute five you have planted, upgraded, used a slowing plant and sped the game up.
+**Balance check.** A test bot plays every garden with 1 to 4 players. New player first try: Backyard about 90% wins, Veggie Rows about half, Night Orchard about 15 to 25%, much the same with friends.
 
-**Money (fair by design).** At launch only four things: 2x speed (149 Robux), a sixth seed slot (199), a "Second Wind" that saves a lost game once (25, and one free every day), and private servers (100 a month; Roblox Plus members get these free and Roblox pays us for their time there). Later, once the game is open to younger players: a monthly "Head Gardener" membership (about US$2.99) and cosmetic plant and garden styles. Never sold: Petals, random packs, or anything that helps on the leaderboard. Be realistic: a small game might make tens of dollars a month; the research expects about 10 weeks to reach Roblox's 30,000 Robux cash out minimum even if things go well.
+**Money (fair by design).** Unchanged at launch: 2x speed (149 Robux; in a group, one owner unlocks it for everyone), a sixth seed slot (199), a "Second Wind" that saves a lost solo game once (25, and one free every day), private servers (100 a month). Never sold: pods, plants, plant levels, Petals, Gumnuts, luck or anything random. A bought Second Wind gives no pods afterwards, so Robux can never lead to a pod. Expect small money at first (tens of dollars a month for a small game).
 
-**How it gets built (4 steps).**
+**How it gets built (from here, about 49 builder days).**
 
-1. **M1 Playable:** one garden, plant, upgrade, sell, win or lose.
-2. **M2 Progress and saving:** all three gardens, Petals, research, the tutorial, saves that are safe across servers.
-3. **M3 Weekly garden:** the Monday generator and the leaderboard.
-4. **M4 Shop and polish:** purchases, co-op with a friend, sounds, phone layout, thumbnail. Then publish to 16+.
+1. **M2 Saves and the hub** (10 days): saving, Nan's Backyard, gates, the tutorial, three gardens, research.
+2. **M3 Co-op runs** (9 days): parties of 1 to 4, zones, Ready, pings, leaving and rejoining.
+3. **M4 The collection** (11 days): 24 plants, pods, guarantees, the Almanac.
+4. **M5 Cast and bosses** (9 days): the Aussie pests, Kevin and Swoopy, Nan's lines.
+5. **M6 Weekly garden, shop and launch** (10 days): then publish to 16+.
 
-The game logic is tested automatically outside Roblox Studio (every number, the weekly generator, saving, purchases). What tests cannot judge is whether it feels fun: that is your 15 minute checklist in section 8.3 of the full spec.
+Parked for later: more game modes, weather and a Saturday event (room is left for each).
 
-**What you need to do.** Have Studio on a Windows or Mac computer. Do the first "Publish to Roblox" from Studio. Create the passes and products in Creator Hub and paste their numbers to the Builder. Do the 15 minute playtest at each step. Answer the maturity questionnaire honestly.
+**What you need to do.** Studio on a Windows or Mac computer; the first "Publish to Roblox" from Studio; create the passes and products in Creator Hub; a short playtest at each step; answer the maturity questionnaire honestly.
 
-**Decisions for you** (details in section 11 of the spec):
+**Decisions for you** (details in section 10 of `design/seed-siege-v2.md`):
 
-1. Are the four launch prices OK?
-2. Sell the sixth seed slot at launch, or wait?
-3. Later, to reach younger players: pay the refundable 1,000 Robux fee or keep Roblox Plus for two months?
-4. Membership price later: US$2.99 (needs ID or phone check) or 249 Robux?
-5. Weekly reset Monday 10am (11am in daylight saving) eastern Australian time: OK?
-6. Please search Roblox for another game already called "Seed Siege" before we publish.
-7. Happy with "Nan" as the tip giving gardener and the Aussie backyard look?
-8. 8 players per server, and co-op at launch or just after?
+1. Up to 12 players per server, with everyone's gardens in the same server? (Recommended yes.)
+2. Kevin as the finale of the first garden? (Yes.)
+3. In co-op, 2x speed if any one player owns it? (Yes.)
+4. Gumnuts and the Seed Swap at launch, so nobody is stuck on one plant? (Yes, first to cut if late.)
+5. No pods after a bought Second Wind? (Yes.)
+6. Aussie names for the original bugs (Sugar Ant, Bogong Moth, Christmas Beetle, Possum Pete)? (Yes.)
 
-Full plan: `design/seed-siege-spec.md`.
+Still open from before: launch prices, the route to younger players, membership price, weekly reset time, and a name search for "Seed Siege" on Roblox.
+
+Full plan: `design/seed-siege-spec.md` (version 1) plus `design/seed-siege-v2.md` (the changes).
