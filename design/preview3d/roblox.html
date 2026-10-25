@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Seed Siege Roblox parts view</title>
+<style>
+  html, body { margin: 0; overflow: hidden; background: #9fd3f2; }
+  canvas#c { display: block; }
+  /* The HUD areas from Visuals.CAMERA_SAFE: top row and the seed cards. */
+  #safe { display: none; position: absolute; inset: 0; pointer-events: none; }
+  #safe .top { position: absolute; left: 0; right: 0; top: 0; height: 15%; background: rgba(20, 18, 26, 0.18); }
+  #safe .cards { position: absolute; left: 0; bottom: 0; width: 46%; height: 21%; background: rgba(20, 18, 26, 0.18); }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="safe"><div class="top"></div><div class="cards"></div></div>
+<script type="module" src="./roblox.js"></script>
+</body>
+</html>

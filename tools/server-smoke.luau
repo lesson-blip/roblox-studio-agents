@@ -121,7 +121,8 @@ function methods:Destroy()
 	self.Parent = nil
 end
 function methods:IsA(c)
-	return c == self.ClassName or c == "Instance" or (c == "BasePart" and self.ClassName == "Part")
+	return c == self.ClassName or c == "Instance"
+		or (c == "BasePart" and (self.ClassName == "Part" or self.ClassName == "WedgePart" or self.ClassName == "CornerWedgePart"))
 end
 function methods:FireClient(player, ...)
 	table.insert(player._inbox, { event = self.Name, args = table.pack(...) })
@@ -257,6 +258,42 @@ local v0 = lastView()
 check(v0 ~= nil and v0.phase == "build" and v0.sap == 200 and v0.hearts == 20, "a Backyard run starts on join (200 Sap, 20 hearts)")
 check(workspaceFake:FindFirstChild("Plots") and workspaceFake.Plots:FindFirstChild("Plot1") ~= nil, "Plot1 was built")
 check(#workspaceFake.Plots.Plot1.Tiles:GetChildren() == 96, "96 tiles built")
+
+-- The backyard around the field (Shared.Art.Garden): every part counted, a sane total,
+-- tiles carry their attributes, and nothing outside Tiles can catch a tap.
+local function descendants(node, out)
+	for _, c in node._children do
+		table.insert(out, c)
+		descendants(c, out)
+	end
+	return out
+end
+local plotParts, queryable, decorParts = 0, 0, 0
+for _, d in descendants(workspaceFake.Plots.Plot1, {}) do
+	if d:IsA("BasePart") then
+		plotParts += 1
+		if d.CanQuery then
+			queryable += 1
+		end
+	end
+end
+for _, d in descendants(workspaceFake.Plots.Plot1.Decor, {}) do
+	if d:IsA("BasePart") then
+		decorParts += 1
+	end
+end
+print("      plot parts: " .. plotParts .. " (decor " .. decorParts .. ")")
+check(plotParts == workspaceFake.Plots.Plot1:GetAttribute("PartCount"), "the plot's PartCount attribute matches its parts")
+check(plotParts < 2500, "the whole plot is under 2,500 parts (" .. plotParts .. ")")
+check(queryable == 96, "only the 96 tiles can be hit by the placement raycast (" .. queryable .. ")")
+local tilesOk = true
+for _, t in workspaceFake.Plots.Plot1.Tiles:GetChildren() do
+	if type(t:GetAttribute("X")) ~= "number" or type(t:GetAttribute("Y")) ~= "number" or type(t:GetAttribute("IsPath")) ~= "boolean" then
+		tilesOk = false
+	end
+end
+check(tilesOk, "every tile has X, Y and IsPath")
+check(workspaceFake.Plots.Plot1.Tiles.T_4_1:GetAttribute("IsPath") == true and workspaceFake.Plots.Plot1.Tiles.T_3_3:GetAttribute("Bed") == true, "path and soil bed tiles are marked")
 
 -- Bad payloads and cheats are refused.
 local r = call("PlaceSeed", "thorn", 4, 1)

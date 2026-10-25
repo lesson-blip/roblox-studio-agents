@@ -39,15 +39,13 @@ end
 
 function Results.init(_bundle: any, stateStore: any, root: Instance)
 	store = stateStore
-	local f = Components.frame({
+	local holder, f = Components.pill({
 		Name = "Results",
 		Size = UDim2.fromOffset(380, 230),
 		Position = UDim2.new(0.5, -190, 0.5, -115),
 		Visible = false,
-		BackgroundTransparency = 0.05,
-	}, root)
-	Components.corner(f, 18)
-	panel = f
+	}, root, 18)
+	panel = holder
 	refs.title = Components.label("", {
 		Size = UDim2.new(1, 0, 0, 44),
 		Position = UDim2.fromOffset(0, 10),
@@ -71,13 +69,13 @@ function Results.init(_bundle: any, stateStore: any, root: Instance)
 	}, function()
 		local res = store.call("RequestStart", "backyard", "normal")
 		if res.ok then
-			f.Visible = false
+			holder.Visible = false
 		end
 	end, f)
 	store.ended:connect(show)
 	store.changed:connect(function(view: any)
 		if view.phase ~= "over" then
-			f.Visible = false
+			holder.Visible = false
 		end
 	end)
 end

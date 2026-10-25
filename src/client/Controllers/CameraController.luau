@@ -1,16 +1,18 @@
 --!strict
--- A fixed camera looking down over the plot, sized so the whole 12 by 8 grid fits
--- between the HUD bars on a phone held sideways.
+-- A fixed 3/4 tower defence camera like the preview hero (design/preview3d): it sits
+-- to the right of the field looking down about 44 degrees, and is fitted (Shared
+-- Art.CameraFit) so the whole 12 by 8 grid and the front of the shed fill the screen
+-- between the top HUD row and the seed cards.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Visuals = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Visuals")) :: any
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Visuals = require(Shared:WaitForChild("Visuals")) :: any
+local CameraFit = require(Shared:WaitForChild("Art"):WaitForChild("CameraFit")) :: any
 
 local CameraController = {}
 
 local L: any = nil
 local store: any = nil
-local TILT = math.rad(58) -- angle down from the horizon
-local MARGIN = 1.35 -- leaves room for the top HUD and the seed bar
 
 local function apply()
 	local camera = workspace.CurrentCamera
@@ -19,20 +21,26 @@ local function apply()
 	end
 	local C = L.Constants
 	local T = Visuals.TILE
-	local w, h = C.GRID_W * T + 4, C.GRID_H * T + 4
-	local centre = Visuals.toWorld(store.origin, C.GRID_W / 2, C.GRID_H / 2 + 0.3, 0)
+	local o = store.origin
+	local w, h = C.GRID_W * T, C.GRID_H * T
+	local top = Visuals.TILE_TOP
+	local points = {
+		o + Vector3.new(0, top, 0), o + Vector3.new(w, top, 0),
+		o + Vector3.new(0, top, h), o + Vector3.new(w, top, h),
+	}
+	-- The front of Nan's shed, past the end of the path.
+	local field = L.Fields.byId[store.view.fieldId]
+	local last = field and field.waypoints[#field.waypoints]
+	if last and (last[1] <= 0 or last[1] >= C.GRID_W - 1) then
+		local x = if last[1] <= 0 then -8 else w + 8
+		table.insert(points, o + Vector3.new(x, 3, (last[2] + 0.5) * T))
+	end
 	camera.CameraType = Enum.CameraType.Scriptable
-	camera.FieldOfView = 40
+	camera.FieldOfView = CameraFit.FOV
 	local vp = camera.ViewportSize
 	local aspect = if vp.Y > 0 then vp.X / vp.Y else 16 / 9
-	local vfov = math.rad(camera.FieldOfView)
-	local hfov = 2 * math.atan(math.tan(vfov / 2) * aspect)
-	local fitW = (w / 2) / math.tan(hfov / 2)
-	-- The plot's depth seen at the tilt angle.
-	local fitH = (h * math.sin(TILT) / 2) / math.tan(vfov / 2) + h * math.cos(TILT) / 2
-	local dist = math.max(fitW, fitH) * MARGIN
-	local offset = Vector3.new(0, math.sin(TILT), math.cos(TILT)) * dist
-	camera.CFrame = CFrame.lookAt(centre + offset, centre)
+	camera.CFrame = CameraFit.fit(points, aspect, Visuals.CAMERA_SAFE, CameraFit.FOV)
+	camera.Focus = CFrame.new(o + Vector3.new(w / 2, 0, h / 2))
 end
 
 function CameraController.init(bundle: any, stateStore: any)

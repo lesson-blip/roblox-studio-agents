@@ -49,6 +49,19 @@ expect("StarterPlayer.StarterPlayerScripts.Client.Util.Signal", "ModuleScript")
 expect("ReplicatedStorage.Shared.LogicBundle", "ModuleScript")
 expect("ReplicatedStorage.Shared.Visuals", "ModuleScript")
 expect("ReplicatedStorage.Shared.Net.Remotes", "ModuleScript")
+for _, s in { "Kit", "Garden", "Props", "Seeds", "Pests", "CameraFit" } do
+	expect("ReplicatedStorage.Shared.Art." .. s, "ModuleScript")
+end
+-- Scene settings (the look of design/preview3d): soft sun shadows and post effects.
+for _, pair in { { "Sky", "Sky" }, { "Atmosphere", "Atmosphere" }, { "ColorCorrection", "ColorCorrectionEffect" }, { "Bloom", "BloomEffect" }, { "SunRays", "SunRaysEffect" } } do
+	expect("Lighting." .. pair[1], pair[2])
+end
+local lighting = game:GetService("Lighting")
+print("Lighting.Technology = " .. tostring(lighting.Technology))
+if lighting.Technology ~= roblox.Enum.Technology.ShadowMap and lighting.Technology ~= roblox.Enum.Technology.Future then
+	print("WRONG    Lighting.Technology should be ShadowMap or Future")
+	problems += 1
+end
 for _, s in { "Constants", "Seeds", "Pests", "Fields", "Grid", "Combat", "Economy", "Validate", "RateLimit", "Views", "WaveSim" } do
 	expect("ReplicatedStorage.Shared.Logic." .. s, "ModuleScript")
 	-- Logic must stay pure: no require, no services, no clock (spec 0).

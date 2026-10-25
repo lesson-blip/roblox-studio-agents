@@ -112,3 +112,89 @@ In Studio: open `build/SeedSiege.rbxl` (or `rojo serve` plus the Rojo plugin), t
     `print(game.ReplicatedStorage.Remotes.PlaceSeed:InvokeServer("thorn", 4, 1).err)`: it should print `on_path`.
     With `"thorn", 8.5, 2` it should print `bad_payload`, and with `"thorn", 0, 0` after spending your Sap, `no_sap`.
 12. Would you play another run right now? One sentence why or why not.
+
+## M1 visuals: the look of the 3D preview, built from Parts (branch `m1-visuals`)
+
+25 October 2026. Presentation only: no Logic module, remote, payload or server rule changed
+(76 tests and the server smoke run give the same results as before).
+
+**What changed**
+
+- `src/shared/Art/` (new). `Kit` turns design/preview3d/scene.js units into Parts (one unit is 2 studs):
+  boxes, balls and squashed balls (sphere SpecialMesh), cylinders, sticks between two points, wedges,
+  stepped cones, cartoon eyes and smiles, and a record of every part so the client can animate it.
+  `Garden` builds the backyard unit for unit from scene.js: raised lawn tiles in six greens, sandstone
+  pavers on a dirt base, 16 timber edged soil beds, grass tufts and flowers, Colorbond fences with
+  ribs, white pickets, the open timber gate and the pests' burrow, Nan's shed (sage ribbed walls,
+  red ribbed roof, green doors, "NAN'S SHED" sign, window and flower box, the heart), rainwater
+  tank, Hills Hoist with washing, raised veggie bed, front flower bed, back deck with barbie, chairs
+  and table, five gum trees with pale trunks and clumped canopies, shrubs, neighbours' fences, shed
+  and trampoline. `Props` has the gnome and Nan (also her head for the HUD portrait). `Seeds` has
+  all 10 plants (Thorn, Sunpetal with a PointLight glow, Burr, Dandelion, Pumpkin, Snapjaw from the
+  preview; Nettle, Mint, Chilli and Oak in the same style). `Pests` has all 10 pests (aphid, ant,
+  snail, beetle, caterpillar from the preview; moth, wasp, mole, slug mum, possum simpler).
+  `CameraFit` is the camera maths.
+- Server: `PlotService` calls `Garden.build`. The 96 tiles keep their names and X, Y, IsPath
+  attributes (plus `Bed`); everything else is in a `Decor` folder with CanQuery off, so taps only hit
+  tiles. `Visuals.PLOT_GAP` is now 180 studs so M2's four yards do not overlap.
+- Lighting (in `default.project.json`, as Technology cannot be set from a script): ShadowMap, warm sun
+  at 14.6 h, soft shadows, Sky, Atmosphere, ColorCorrection, a light Bloom and SunRays.
+- Client: plants sway, nod, turn to the pest they shot and kick (Snapjaw snaps its jaw); pests bob,
+  wiggle legs (flyers flap), face along the path, and caterpillar segments follow the path; all
+  through one `workspace:BulkMoveTo` a frame per renderer. Rounded health bars that change colour.
+  Shots by seed: glowing darts (Thorn), burrs, white puffs on an arc (Dandelion), a glowing pumpkin on
+  a high arc with a splash ring (Pumpkin), a snap and flash (Snapjaw); leaf burst and a green "+N"
+  when a pest is shooed; effect parts are pooled. Range rings are a cream disc with a white edge.
+- Camera: fixed 3/4 view from the right, 44 degrees down, FOV 36, fitted so the grid and the front of
+  the shed fill the screen between the HUD rows (`Visuals.CAMERA_SAFE`).
+- HUD restyled like the preview: dark pills with heart and Sap drop icons drawn from frames, white
+  Fredoka numbers with a dark stroke, "Wave n / 10" with a gold bar and "N pests left", blue 1.5x
+  button and menu button, seed cards in each seed's colours with a ViewportFrame portrait of the real
+  plant model, key number, name, cost and "need N" or "Locked" over the portrait, keys 1 to 6 pick a
+  card, Start wave in green, Nan's tip bubble with her 3D portrait speaks every toast.
+- Owner's first playtest fixes: the HUD now starts under the Roblox top bar (measured from
+  `GuiService.TopbarInset` and `GetGuiInset`, `ScreenInsets = DeviceSafeInsets`); the player list,
+  chat window, backpack, emotes and health bar are turned off (`SetCoreGuiEnabled`; the game has no
+  typing, so chat is off; switch it back on in `Main.client.luau` if co-op wants it); the seed cards
+  are a fixed 88 points tall with the "need N" note inside the card, and the UI scale is worked out
+  from the height left under the top bar, so they fit at 1057 by 576 and on a phone held sideways;
+  the camera is fitted tight like preview-hero.png.
+
+**Part counts** (from the smoke run and `tools/export-parts`): the static plot is **1,628 parts**
+(96 tiles, 1,532 decor). The 8 plants in the export scene are 276 parts (about 25 to 45 each, with
+their soil plot) and the 8 pests 173 (about 15 to 30 each). A full late wave of 40 pests and 15 plants
+adds about 1,500 moving parts on the client.
+
+**Checks run here**
+
+- `luau-lsp analyze` with the Roblox definitions: no errors in `src`.
+- `lune run tests/run`: 76 passed, 0 failed.
+- `lune run tools/server-smoke`: 47 passed, 0 failed (5 new: part count matches, under 2,500, only
+  the 96 tiles can be hit by a raycast, every tile has its attributes, path and bed tiles marked).
+- `rojo build -o build/SeedSiege.rbxl` builds; `lune run tools/check-place` OK (now also checks the
+  Art modules, the Lighting children and Technology).
+- `lune run tools/export-parts` builds the real Art code with Lune's Roblox instances and
+  `design/preview3d/render-roblox.js` draws those exact parts with three.js:
+  `media/3d/roblox-parts-game-1600x900.png`, `roblox-parts-game-1057x576.png` (the owner's screen
+  size) and `roblox-parts-overview-1600x900.png`. They match preview-hero.png closely. This is
+  three.js lighting, not Roblox's, and it assumes Roblox's wedge shape (full height at the back);
+  it checks shapes, sizes, placement and framing only.
+
+**Not verified (needs Studio):** how Roblox's lighting, shadows and post effects look; the sun
+direction (if shadows fall towards the camera, change `Lighting.ClockTime` in
+`default.project.json`, for example 9.5); the shed gables (if they look like a V, the wedges need
+turning 180 degrees in `Garden.shed`); squashed balls (SpecialMesh) and thin parts at a distance;
+frame rate on a phone with a full wave; the HUD clear of the top bar on a real phone; ViewportFrame
+portraits; client scripts have only been type checked, not run.
+
+### Owner's 3 minute look
+
+1. Open `build/SeedSiege.rbxl` (after `rojo build`), press Play. Output has no red errors.
+2. Compare with `media/3d/preview-hero.png`: a fenced backyard with the shed and Nan on the right,
+   Hills Hoist and veggie bed at the back, deck and barbie at the front, pavers and soil beds, soft
+   shadows. Hearts, Sap and the wave title sit under Roblox's top bar; speed and menu are visible
+   top right; no player list or chat.
+3. Plant a Thorn and a Sunpetal (the cards show 3D plants; "need N" fits inside a card). Start the
+   wave: aphids walk with wiggling legs, darts fly, leaves burst with "+3".
+4. Send a screenshot at the start of wave 1 and one mid wave, plus the Output window if anything is
+   red. Say if the shadows fall towards the camera or the shed roof ends look wrong.

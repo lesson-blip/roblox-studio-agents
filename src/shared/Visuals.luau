@@ -1,12 +1,44 @@
 --!strict
--- Placeholder looks for M1: plain Parts in colours and simple shapes (no meshes or
--- uploaded assets). Also the tile to world maths shared by server and client.
+-- Shared look constants and the tile to world maths used by server and client.
+-- The models themselves are built from Parts in `Shared.Art` (see design/preview3d,
+-- the three.js mock up they follow). One preview unit is UNIT studs.
 
 local Visuals = {}
 
 Visuals.TILE = 4 -- studs per tile (Constants.TILE_STUDS)
-Visuals.PLOT_GAP = 80 -- studs between plots along X
+Visuals.PLOT_GAP = 180 -- studs between plots along X (a whole yard and its neighbours fit)
+Visuals.UNIT = 2 -- studs per preview unit (the preview's tile is 2 units, ours 4 studs)
 
+-- Heights in studs (preview TILE_TOP 0.42, PATH_Y 0.32, PLOT_TOP 0.52 units).
+Visuals.TILE_TOP = 0.84 -- top of a lawn tile
+Visuals.PATH_TOP = 0.64 -- top of the sandstone pavers, where pests walk
+Visuals.PLOT_TOP = 1.04 -- top of a soil plot, where plants stand
+Visuals.SEED_SCALE = 1.4 * 2 -- studs per unit for plants (scene.js placeSeed scale 1.4)
+Visuals.PEST_SCALE = 1.7 * 2 -- studs per unit for pests (scene.js scale about 1.7)
+
+-- Where the field must sit on screen (normalised -1..1 from the centre): clear of the
+-- top HUD row and mostly clear of the seed cards, like design/preview3d hero.
+Visuals.CAMERA_SAFE = { left = -0.97, right = 0.97, bottom = -0.62, top = 0.74 }
+
+-- Empty soil beds dotted over the lawn (scene.js PLOTS); any that fall on a path are skipped.
+Visuals.BEDS = {
+	{ 3, 3 }, { 1, 2 }, { 6, 5 }, { 10, 3 }, { 3, 5 }, { 7, 2 }, { 2, 0 }, { 6, 0 },
+	{ 10, 0 }, { 6, 3 }, { 8, 2 }, { 1, 5 }, { 5, 7 }, { 9, 7 }, { 10, 5 }, { 4, 2 },
+}
+
+-- Seed card gradients (top, bottom) as in the preview HUD; others get their own colour.
+Visuals.CARD = {
+	thorn = { Color3.fromRGB(155, 227, 106), Color3.fromRGB(79, 174, 60) },
+	sunpetal = { Color3.fromRGB(255, 226, 122), Color3.fromRGB(242, 176, 30) },
+	burr = { Color3.fromRGB(214, 184, 140), Color3.fromRGB(150, 104, 60) },
+	nettle = { Color3.fromRGB(190, 236, 160), Color3.fromRGB(90, 160, 90) },
+	dandelion = { Color3.fromRGB(191, 230, 255), Color3.fromRGB(111, 181, 234) },
+	pumpkin = { Color3.fromRGB(255, 187, 114), Color3.fromRGB(238, 122, 42) },
+	mint = { Color3.fromRGB(196, 248, 228), Color3.fromRGB(80, 190, 150) },
+	chilli = { Color3.fromRGB(255, 160, 140), Color3.fromRGB(205, 50, 45) },
+	snapjaw = { Color3.fromRGB(255, 154, 168), Color3.fromRGB(222, 74, 99) },
+	oak = { Color3.fromRGB(200, 176, 140), Color3.fromRGB(120, 86, 50) },
+} :: { [string]: { Color3 } }
 export type SeedLook = { color: Color3, shape: string, height: number, width: number, accent: Color3 }
 export type PestLook = { color: Color3, size: number, fly: number }
 

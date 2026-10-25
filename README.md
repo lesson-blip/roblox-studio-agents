@@ -6,6 +6,7 @@ owner summary: `design/seed-siege-onepager.md`. Latest build notes: `build/BUILD
 ## Layout
 
 - `src/shared/Logic/` pure game rules (no Roblox services, no clock). Lune and Roblox run the same files.
+- `src/shared/Art/` builds every model from Parts (garden, plants, pests, Nan) and the camera fit.
 - `src/shared/` also holds `LogicBundle.luau` (wires the Logic modules in Roblox), `Visuals.luau` and `Net/Remotes.luau`.
 - `src/server/` server scripts (`Main.server.luau` and `Services/`).
 - `src/client/` client scripts (`Main.client.luau`, `Controllers/`, `UI/`).
@@ -35,6 +36,8 @@ lune run tests/run combat     # only spec files whose name contains "combat"
 lune run tools/balance-report # prints the balance table (spec 3.7) from the Luau code
 lune run tools/check-place    # checks the built place file has every script in the right spot
 lune run tools/server-smoke   # runs the real server scripts headless with fake Roblox services
+lune run tools/export-parts   # writes every Part the Art code builds to design/preview3d/export/parts.json
+                              # (then `node design/preview3d/render-roblox.js` draws it with three.js)
 ```
 
 Type checking (optional):

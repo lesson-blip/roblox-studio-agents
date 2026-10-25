@@ -66,14 +66,13 @@ end
 function Inspector.init(bundle: any, stateStore: any, root: Instance)
 	L = bundle
 	store = stateStore
-	local f = Components.frame({
+	local holder, f = Components.pill({
 		Name = "Inspector",
 		Size = UDim2.fromOffset(470, 104),
-		Position = UDim2.new(0, 8, 1, -112),
+		Position = UDim2.new(0, 8, 1, -114),
 		Visible = false,
-	}, root)
-	Components.corner(f, 14)
-	panel = f
+	}, root, 14)
+	panel = holder
 	refs.name = Components.label("", {
 		Size = UDim2.new(1, -60, 0, 24),
 		Position = UDim2.fromOffset(12, 4),

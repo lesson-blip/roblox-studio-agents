@@ -4,6 +4,8 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
+local StarterGui = game:GetService("StarterGui")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local L = require(Shared:WaitForChild("LogicBundle")) :: any
@@ -25,13 +27,32 @@ local Results = require(UI:WaitForChild("Results")) :: any
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui") :: PlayerGui
 
+-- A single player plot game with no typing (spec 1): the player list, chat window,
+-- backpack and emotes would only sit over the HUD. (Owner playtest, M1: the player
+-- list hid the speed and menu buttons and the chat notice covered hearts and Sap.)
+for _, kind in { Enum.CoreGuiType.PlayerList, Enum.CoreGuiType.Chat, Enum.CoreGuiType.Backpack, Enum.CoreGuiType.EmotesMenu, Enum.CoreGuiType.Health } do
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(kind, false)
+	end)
+end
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "SeedSiegeHud"
 gui.ResetOnSpawn = false
-gui.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
+-- Only the device's notch and rounded corners are kept out; the Roblox top bar is
+-- kept clear by hand below (CoreUISafeInsets still put the HUD under it in playtest).
+gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- One layout for every screen, scaled from the 844 by 390 phone reference (spec 7).
+-- Height of the Roblox top bar (its buttons), in pixels from the top of the screen.
+local function topInset(): number
+	local inset = GuiService:GetGuiInset()
+	local bar = GuiService.TopbarInset
+	return math.max(inset.Y, bar.Max.Y, 36) + 6
+end
+
+-- One layout for every screen, scaled from the 844 by 390 phone reference (spec 7),
+-- measured on the space left under the top bar.
 local uiScale = Instance.new("UIScale")
 uiScale.Parent = gui
 local function rescale()
@@ -40,8 +61,8 @@ local function rescale()
 		return
 	end
 	local vp = camera.ViewportSize
-	local s = math.min(vp.X / Theme.REF_W, vp.Y / Theme.REF_H)
-	uiScale.Scale = math.clamp(s, 0.75, 1.5)
+	local s = math.min(vp.X / Theme.REF_W, (vp.Y - topInset()) / Theme.REF_H)
+	uiScale.Scale = math.clamp(s, 0.7, 1.5)
 end
 rescale()
 if workspace.CurrentCamera then
@@ -49,7 +70,7 @@ if workspace.CurrentCamera then
 end
 
 -- With UIScale, children are laid out in a box of the reference size, so the HUD
--- sits in a full screen frame sized by 1 / scale.
+-- sits in a frame sized by 1 / scale, starting just under the top bar.
 local root = Instance.new("Frame")
 root.Name = "Root"
 root.BackgroundTransparency = 1
@@ -57,10 +78,16 @@ root.Size = UDim2.fromScale(1, 1)
 root.Parent = gui
 local function sizeRoot()
 	local s = uiScale.Scale
-	root.Size = UDim2.fromScale(1 / s, 1 / s)
+	local top = topInset() / s
+	root.Position = UDim2.fromOffset(0, top)
+	root.Size = UDim2.new(1 / s, 0, 1 / s, -top)
 end
 sizeRoot()
 uiScale:GetPropertyChangedSignal("Scale"):Connect(sizeRoot)
+GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(function()
+	rescale()
+	sizeRoot()
+end)
 
 StateStore.init(L)
 CameraController.init(L, StateStore)
